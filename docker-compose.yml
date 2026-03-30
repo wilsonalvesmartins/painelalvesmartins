@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  painel-advocacia:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: alves-martins-painel:latest
+    container_name: alves-martins-painel
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./vps-data:/app/data  # <--- BLINDAGEM DOS DADOS (Persistência Externa no VPS)
