@@ -987,6 +987,7 @@ function AssistenteIA({ config }) {
   const [prompt, setPrompt] = useState('');
   const [historico, setHistorico] = useState([{role: 'model', text: 'Olá, sou a Inteligência Artificial do escritório Alves Martins. Como posso ajudar na redação de peças, análise de documentos ou dúvidas jurídicas hoje?'}]);
   const [loading, setLoading] = useState(false);
+  const [modeloAtivo, setModeloAtivo] = useState('');
   const endOfMessagesRef = useRef(null);
 
   useEffect(() => {
@@ -1002,7 +1003,53 @@ function AssistenteIA({ config }) {
     setLoading(true);
 
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${config.geminiKey}`, {
+      let modelToUse = modeloAtivo;
+
+      // Descoberta Automática de Modelos (Se ainda não foi descoberto nesta sessão)
+      if (!modelToUse) {
+        const modelsRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${config.geminiKey}`);
+        const modelsData = await modelsRes.json();
+        
+        if (modelsData.error) throw new Error(modelsData.error.message);
+
+        if (modelsData.models) {
+           // Filtra apenas modelos que suportam geração de texto
+           const validModels = modelsData.models
+              .filter(m => m.supportedGenerationMethods?.includes('generateContent'))
+              .map(m => m.name);
+           
+           // Prioriza os melhores e mais rápidos modelos de acordo com a lista da Google
+           const prioridades = [
+              'models/gemini-2.5-flash',
+              'models/gemini-2.5-pro',
+              'models/gemini-1.5-flash',
+              'models/gemini-1.5-pro',
+              'models/gemini-pro'
+           ];
+
+           let encontrado = null;
+           for (const p of prioridades) {
+             if (validModels.includes(p)) {
+               encontrado = p.replace('models/', '');
+               break;
+             }
+           }
+
+           if (encontrado) {
+             modelToUse = encontrado;
+             setModeloAtivo(encontrado);
+           } else {
+             // Fallback de segurança se a API retornar algo inesperado
+             modelToUse = validModels.length > 0 ? validModels[0].replace('models/', '') : 'gemini-1.5-flash';
+             setModeloAtivo(modelToUse);
+           }
+        } else {
+           modelToUse = 'gemini-1.5-flash';
+        }
+      }
+
+      // Faz a chamada final com o modelo correto e descoberto
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${config.geminiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1039,7 +1086,7 @@ function AssistenteIA({ config }) {
         <Bot className="mr-3 text-blue-400" size={24}/>
         <div>
           <h3 className="font-semibold text-sm">Gemini Legal Assistant</h3>
-          <p className="text-xs text-slate-400 font-mono mt-0.5">Modelo: 1.5-Flash | Status: Online</p>
+          <p className="text-xs text-slate-400 font-mono mt-0.5">Modelo: {modeloAtivo || 'Autodetectando...'} | Status: Online</p>
         </div>
       </div>
       
