@@ -1002,7 +1002,7 @@ function AssistenteIA({ config }) {
     setLoading(true);
 
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${config.geminiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${config.geminiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1039,7 +1039,7 @@ function AssistenteIA({ config }) {
         <Bot className="mr-3 text-blue-400" size={24}/>
         <div>
           <h3 className="font-semibold text-sm">Gemini Legal Assistant</h3>
-          <p className="text-xs text-slate-400 font-mono mt-0.5">Modelo: 2.5-Flash | Status: Online</p>
+          <p className="text-xs text-slate-400 font-mono mt-0.5">Modelo: 1.5-Flash | Status: Online</p>
         </div>
       </div>
       
