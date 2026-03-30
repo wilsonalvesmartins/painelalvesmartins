@@ -7,7 +7,8 @@ services:
     image: alves-martins-painel:latest
     container_name: alves-martins-painel
     restart: always
-    ports:
-      - "80:80"
+    # Substituímos o 'ports' pelo 'expose' para não entrar em conflito com o proxy do Coolify
+    expose:
+      - "80"
     volumes:
-      - ./vps-data:/app/data  # <--- BLINDAGEM DOS DADOS (Persistência Externa no VPS)
+      - ./vps-data:/app/data
