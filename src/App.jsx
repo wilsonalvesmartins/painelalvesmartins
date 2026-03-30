@@ -475,6 +475,12 @@ function ClientesManager({ clientes, setClientes }) {
     setFormData({});
   };
 
+  const handleDelete = (id) => {
+    if (window.confirm("Tem certeza que deseja apagar este cliente?")) {
+      setClientes(clientes.filter(c => c.id !== id));
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col">
       <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 rounded-t-xl">
@@ -503,8 +509,8 @@ function ClientesManager({ clientes, setClientes }) {
                 <td className="py-3 text-gray-600">{c.cpf}</td>
                 <td className="py-3 text-gray-600">{c.telefone}</td>
                 <td className="py-3 flex space-x-2">
-                  <button onClick={() => { setFormData(c); setIsModalOpen(true); }} className="text-blue-500 hover:text-blue-700"><Edit2 size={16}/></button>
-                  <button className="text-red-500 hover:text-red-700"><Trash2 size={16}/></button>
+                  <button onClick={() => { setFormData(c); setIsModalOpen(true); }} className="text-blue-500 hover:text-blue-700 p-1"><Edit2 size={16}/></button>
+                  <button onClick={() => handleDelete(c.id)} className="text-red-500 hover:text-red-700 p-1"><Trash2 size={16}/></button>
                 </td>
               </tr>
             ))}
@@ -554,6 +560,12 @@ function ProcessosManager({ processos, setProcessos, clientes }) {
     setFormData({});
   };
 
+  const handleDelete = (id) => {
+    if (window.confirm("Tem certeza que deseja apagar este processo?")) {
+      setProcessos(processos.filter(p => p.id !== id));
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full flex flex-col">
        <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 rounded-t-xl">
@@ -587,6 +599,7 @@ function ProcessosManager({ processos, setProcessos, clientes }) {
                 </td>
                 <td className="py-3 flex space-x-2">
                   <button onClick={() => { setFormData(p); setIsModalOpen(true); }} className="text-blue-500 hover:text-blue-700 p-1"><Edit2 size={16}/></button>
+                  <button onClick={() => handleDelete(p.id)} className="text-red-500 hover:text-red-700 p-1"><Trash2 size={16}/></button>
                 </td>
               </tr>
             ))}
@@ -955,7 +968,12 @@ function KanbanBoard({ processos, setProcessos, clientes, arquivos, setArquivos,
                <div>
                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 mt-4">Ações</h4>
                 <button className="w-full text-left px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-sm font-medium text-gray-700 rounded-md flex items-center mb-1.5 transition-colors"><ArrowRight size={16} className="mr-2 text-gray-500"/> Mover</button>
-                <button className="w-full text-left px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 text-sm font-medium rounded-md flex items-center transition-colors"><Trash2 size={16} className="mr-2"/> Arquivar Processo</button>
+                <button onClick={() => {
+                   if(window.confirm("Deseja arquivar e apagar este processo?")) {
+                      setProcessos(processos.filter(p => p.id !== selectedCard.id));
+                      setSelectedCard(null);
+                   }
+                }} className="w-full text-left px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 text-sm font-medium rounded-md flex items-center transition-colors"><Trash2 size={16} className="mr-2"/> Arquivar Processo</button>
               </div>
 
                <div className="pt-4 border-t border-gray-200 mt-4">
